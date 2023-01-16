@@ -1,13 +1,17 @@
 import type { Actions, PageServerLoad } from './$types';
-import pb from '$lib/server/pb';
+// import pb from '$lib/server/pb';
 import type { IExpense } from '$lib/types';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ request, locals }) => {
+	// const { email, password } = await request.json();
+
+	// const { token, record } = await locals.pb.collection('users').authWithPassword(email, password);
+
 	let expenses: IExpense[] = [];
 
 	// look into auto cancel
 	// https://github.com/pocketbase/js-sdk#auto-cancellation
-	const records = await pb.collection('expenses').getFullList<IExpense>(200 /* batch size */, {
+	const records = await locals.pb.collection('expenses').getFullList<IExpense>(200 /* batch size */, {
 		// sort in ascending order
 		sort: '+created',
 	});
@@ -24,7 +28,7 @@ export const load = (async ({ params }) => {
 }) satisfies PageServerLoad;
 
 export const actions: Actions = {
-	default: async ({ request }) => {
+	default: async ({ request, locals }) => {
 
 		const data = await request.formData();
 
@@ -47,11 +51,11 @@ export const actions: Actions = {
 			expenses.forEach(async (expense) => {
 				if(!expense.id) {
 					// create
-					await pb.collection('expenses').create(expense);
+					await locals.pb.collection('expenses').create(expense);
 				}
 				else {
 					// update
-					await pb.collection('expenses').update(expense.id.toString(), expense);
+					await locals.pb.collection('expenses').update(expense.id.toString(), expense);
 				}
 			});
 		} catch (error) {

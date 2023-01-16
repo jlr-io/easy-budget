@@ -11,7 +11,7 @@
 	// const user = writable(null);
 </script>
 
-<h1>Login!</h1>
+<h1>Welcome to Easy Budget!</h1>
 
 <!-- sign up -->
 <form method="POST"	use:enhance={() => {
@@ -36,8 +36,6 @@
     />
 	<button formaction="?/login">Login</button>
 </form>
-
-<p>Don't have an account? <a href="/signup">Sign up!</a></p>
 
 {#if form?.success}
 	success
