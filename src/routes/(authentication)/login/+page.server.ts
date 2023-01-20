@@ -2,11 +2,8 @@ import { redirect, type Actions } from "@sveltejs/kit";
 
 export const actions: Actions = {
 	login: async ({ request, locals }) => {
-		console.log('login');
 
 		const data = await request.formData();
-		// console.log(data);
-
 		const username = data.get('username');
 		const password = data.get('password');
 
@@ -17,11 +14,10 @@ export const actions: Actions = {
 		try {
 			await locals.pb.collection('users').authWithPassword(username.toString(), password.toString());
 		} catch(error) {
-			console.log(error);
 			return { success: false, error: "Error logging in" };
 		}
 
-		console.log('user: ' + JSON.stringify(locals.pb.authStore.model));
-		throw redirect(307, '/')
+		// redirect to home
+		throw redirect(307, '/~')
 	},
 }

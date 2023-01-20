@@ -1,17 +1,15 @@
 <script lang="ts">
 	import { applyAction, enhance } from "$app/forms";
-	// import { writable } from "svelte/store";
 
 	export let form: any;
 
 	let username: string;
 	let password: string;
-	// let passwordConfirm: string;
+	let passwordConfirm: string;
 
-	// const user = writable(null);
 </script>
 
-<h1>Login!</h1>
+<h2>Signup!</h2>
 
 <!-- sign up -->
 <form method="POST"	use:enhance={() => {
@@ -34,15 +32,15 @@
 			name="password"
       bind:value={password} 
     />
-	<button formaction="?/login">Login</button>
+
+		<input 
+      placeholder="Confirm Password" 
+      type="password"
+			name="passwordConfirm"
+      bind:value={passwordConfirm} 
+    />
+
+	<button formaction="?/signUp">Sign Up</button>
 </form>
 
-<p>Don't have an account? <a href="/signup">Sign up!</a></p>
-
-{#if form?.success}
-	success
-{/if}
-
-{#if form?.error}
-	{form.error}
-{/if}
+<p>Already have an account? <a href='/login'>Login!</a></p>

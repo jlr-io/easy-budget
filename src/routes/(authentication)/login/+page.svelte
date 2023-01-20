@@ -1,18 +1,18 @@
 <script lang="ts">
 	import { applyAction, enhance } from "$app/forms";
-	import { writable } from "svelte/store";
 
-	export let form: any;
+	export let form: {
+		success: boolean,
+		error: string
+	};
 
 	let username: string;
 	let password: string;
-	let passwordConfirm: string;
 
 </script>
 
-<h2>Signup!</h2>
+<h1>Login</h1>
 
-<!-- sign up -->
 <form method="POST"	use:enhance={() => {
 	// disables form refresh on submit
 	// still updates form object
@@ -33,13 +33,11 @@
 			name="password"
       bind:value={password} 
     />
-
-		<input 
-      placeholder="Confirm Password" 
-      type="password"
-			name="passwordConfirm"
-      bind:value={passwordConfirm} 
-    />
-
-	<button formaction="?/signUp">Sign Up</button>
+	<button formaction="?/login">Login</button>
 </form>
+
+<p>Don't have an account? <a href='/signup'>Signup</a></p>
+
+{#if form?.error}
+	{form.error}
+{/if}
