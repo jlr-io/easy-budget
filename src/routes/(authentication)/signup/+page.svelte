@@ -43,4 +43,8 @@
 	<button formaction="?/signUp">Sign Up</button>
 </form>
 
+{#if form?.error}
+	<p>{form.error}</p>
+{/if}
+
 <p>Already have an account? <a href='/login'>Login!</a></p>
