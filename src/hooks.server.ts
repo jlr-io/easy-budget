@@ -1,4 +1,4 @@
-import { redirect, type Handle } from '@sveltejs/kit';
+import { redirect, type Handle, type HandleServerError } from '@sveltejs/kit';
 import PocketBase from 'pocketbase';
 
 export const handle = (async ({ event, resolve }) => {
@@ -15,7 +15,7 @@ export const handle = (async ({ event, resolve }) => {
 			id: event.locals.pb.authStore.model?.id,
 			name: event.locals.pb.authStore.model?.username,
 			email: event.locals.pb.authStore.model?.email
-		} : null;
+		} : undefined;
 	} catch (_) {
 		// clear the auth store on failed refresh
 		event.locals.pb.authStore.clear();
@@ -37,3 +37,12 @@ export const handle = (async ({ event, resolve }) => {
 
 	return response;
 }) satisfies Handle;
+
+export const handleError = (({ error, event }) => {
+  const errorId = crypto.randomUUID();
+ 
+  return {
+    message: "Something went wrong. Please try again.",
+    errorId
+  };
+}) satisfies HandleServerError;

@@ -1,9 +1,7 @@
-import { writable } from "svelte/store";
-import type { IExpense, IUser } from "$lib/types";
+import type { IExpense } from "$lib/types";
+import { derived, writable } from "svelte/store";
 
-export const currentUser = writable<IUser | undefined>();
-
-function expenseState() {
+function state() {
 	const { subscribe, set, update } = writable<IExpense[]>([]);
 	return {
 		subscribe,
@@ -17,10 +15,11 @@ function expenseState() {
 				category: expense?.category ?? '',
 				frequency: expense?.frequency ?? '',
 				essential: expense?.essential ?? false,
-			 }); 
+			}); 
 			return e;
 		}),
 	};
 }
 
-export const expenses = expenseState();
+export const expenses = state();
+export const totalAmount = derived(expenses, $expenses => $expenses.map(expense => expense.cost).reduce((acc, cur) => acc + cur));

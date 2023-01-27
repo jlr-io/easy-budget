@@ -13,6 +13,7 @@
 
 </script>
 
-<a href='/logout'>logout</a>
+<a data-sveltekit-preload-data="tap" href='/logout'>Logout</a>
+<a href='/expenses'>Expenses</a>
 
 <slot />

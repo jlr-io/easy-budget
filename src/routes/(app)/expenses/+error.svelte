@@ -1,2 +1,2 @@
 <h2>Error</h2>
-<p>An error occurred..</p>
+<p>An error occured retreiving data from the server.</p>

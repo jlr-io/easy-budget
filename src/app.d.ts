@@ -9,8 +9,12 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			pb: PocketBase
-			user: any
-		}	
+			user: IUser | undefined
+		}
+		interface Error {
+			message: string;
+			errorId: string;
+		}
 		// interface PageData {}
 		// interface Platform {}
 	}
