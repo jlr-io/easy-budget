@@ -11,8 +11,6 @@
 		frequencies: IFrequency[];
 	};
 
-	
-
 	interface DeleteAction {
 		success: boolean;
 		error: string;

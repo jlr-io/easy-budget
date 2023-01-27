@@ -31,24 +31,24 @@ export const load = (async ({ locals }) => {
   };
 }) satisfies PageServerLoad;
 
-function parseFormData(formData: FormData): IExpense[] {
-	const ids = formData.getAll('id');
-	const names = formData.getAll('name');
-	const costs = formData.getAll('costs');
-	const categories = formData.getAll('category');
-	const frequencies = formData.getAll('frequency');
-	const essentials = formData.getAll('essential');
+// function parseFormData(formData: FormData): IExpense[] {
+// 	const ids = formData.getAll('id');
+// 	const names = formData.getAll('name');
+// 	const costs = formData.getAll('costs');
+// 	const categories = formData.getAll('category');
+// 	const frequencies = formData.getAll('frequency');
+// 	const essentials = formData.getAll('essential');
 
-	// create array of objects from form data
-	return ids.map((id, i) => ({ 
-		id: id.toString(),
-		name: names[i].toString(),
-		cost: +costs[i].toString(),
-		category: categories[i].toString(),
-		frequency: frequencies[i].toString(),
-		essential: essentials[i] === 'true' ? true : false,
-	})).filter(e => e.name && e.cost && e.category && e.frequency);
-}
+// 	// create array of objects from form data
+// 	return ids.map((id, i) => ({ 
+// 		id: id.toString(),
+// 		name: names[i].toString(),
+// 		cost: +costs[i].toString(),
+// 		category: categories[i].toString(),
+// 		frequency: frequencies[i].toString(),
+// 		essential: essentials[i] === 'true' ? true : false,
+// 	})).filter(e => e.name && e.cost && e.category && e.frequency);
+// }
 
 export const actions: Actions = {
 	save: async ({ request, locals }) => {
@@ -56,39 +56,35 @@ export const actions: Actions = {
 		const user = locals.user?.id;
 
 		const data = await request.formData();
-		const expenses = parseFormData(data);
-		// console.log(data);
-		// const ids = data.getAll('id');
-		// const names = data.getAll('name');
-		// const costs = data.getAll('costs');
-		// const categories = data.getAll('category');
-		// const frequencies = data.getAll('frequency');
-		// const essentials = data.getAll('essential');
+		const ids = data.getAll('id');
+		const names = data.getAll('name');
+		const costs = data.getAll('cost');
+		const categories = data.getAll('category');
+		const frequencies = data.getAll('frequency');
+		const essentials = data.getAll('essential');
 
 		// // create array of objects from form data
-		// let expenses = ids.map((id, i) => ({ 
-		// 	id: id.toString(),
-		// 	name: names[i].toString(),
-		// 	cost: costs[i].toString(),
-		// 	category: categories[i].toString(),
-		// 	frequency: frequencies[i].toString(),
-		// 	essential: essentials[i] === 'true' ? true : false,
-		// })).filter(e => e.name && e.cost && e.category && e.frequency);
-		// // const expenses = parseFormData(data);
+		let expenses = ids.map((id, i) => ({
+			id: id.toString(),
+			name: names[i].toString(),
+			cost: +costs[i].toString(),
+			category: categories[i].toString(),
+			frequency: frequencies[i].toString(),
+			essential: essentials[i] === 'true' ? true : false
+		})).filter(e => e.name && e.cost && e.category && e.frequency);
 
-		// console.log(expenses);
 		// // if no expenses, return success
-		// if(!expenses.length) {
-		// 	return { success: true };
-		// }
+		if(!expenses.length) {
+			return { success: true };
+		}
 
-		// // create or update each expense
-		// expenses.forEach(async (expense) => {
-		// 	console.log(expense);
-		// 	expense.id 
-		// 	? await locals.pb.collection('expenses').update(expense.id, {user, ...expense}).catch((e) => { throw error(500, e) })
-		// 	: await locals.pb.collection('expenses').create({ user, ...expense}).catch((e) => { throw error(500, e) })
-		// });
+		// create or update each expense
+		expenses.forEach(async (expense) => {
+			console.log(expense);
+			expense.id 
+			? await locals.pb.collection('expenses').update(expense.id, {user, ...expense}).catch((e) => { throw error(500, e) })
+			: await locals.pb.collection('expenses').create({ user, ...expense}).catch((e) => { throw error(500, e) })
+		});
 		
 		return { success: true }
 	},
