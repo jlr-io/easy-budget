@@ -38,62 +38,30 @@
 
 	onMount(() => {
 		expenses.set(data.expenses)
-		expenses.set([{
-			name: 'test',
-			cost: 10,
-			category: data.categories[0].id,
-			frequency: data.frequencies[0].id,
-			essential: false
-		}])
 	});
 
 	// keeps expenses in sync with form
 	afterUpdate(() => {
-
-		// expenses.set(data.expenses);
-
+		// delete type guard
 		if(form && "id" in form) {
-			console.log('form: ' + JSON.stringify(form));
 			for (let i = 0; i < $expenses.length; i++) {
 				if($expenses[i].id === form.id) {
 					$expenses.splice(i, 1);
 					expenses.set($expenses);
+					form.id = undefined;
 					break;
 				}
 			}
 		}
 
-		// if(form) {
-			// if (form && "id" in form) {
-			// 	// remove expense from store
-			// 	const index = $expenses.findIndex((e) => e.id === form);
-			// 	if (index > -1) {
-			// 		$expenses.splice(index, 1);
-			// 		expenses.set($expenses);
-			// 	}
-			// }
-		// }
-		// console.log('form: ' + JSON.stringify(form.expenses));
-		// console.log('data: ' + JSON.stringify(data.expenses));
-		// // expenses.set($expenses.concat(data.expenses));
+		// add type guard
+		if(form && "expenses" in form) {
+			expenses.set($expenses.concat(form.expenses ?? []));
+			$expenses = [...$expenses]
+			form.expenses = undefined;
+		}
 
-		// // was a delete action
-		// if ("id" in form) {
-		// 	// remove expense from store
-		// 	const index = $expenses.findIndex((e) => e.id === form.id);
-		// 	if (index > -1) {
-		// 		$expenses.splice(index, 1);
-		// 		expenses.set($expenses);
-		// 	}
-		// }
-
-		// if (form?.expenses) {
-		// 	console.log('form: ' + JSON.stringify(form.expenses));
-		// 	// expenses.set(form.expenses);
-		// 	// $expenses = [...$expenses, ...form.expenses];
-		// 	expenses.set($expenses.concat(form.expenses));
-		// }
-		
+		// update type guard
 	});
 </script>
 
@@ -165,13 +133,13 @@
 						name="essential"
 					/>
 				</td>
-				<!-- <td>
+				<td>
 					{#if expense?.id }
 						<button name="delete-id" value={expense?.id} formaction="?/delete">Delete</button>
 					{:else}
 						<button on:click|preventDefault={() => removeIndex(i)}>Remove</button>
 					{/if}
-				</td> -->
+				</td>
 			</tr>
 		{/each}
 		<button on:click|preventDefault={() => expenses.add()}> Add Expense </button>
