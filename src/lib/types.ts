@@ -4,6 +4,16 @@ export interface IUser {
 	email: string;
 }
 
+export enum Categories {
+	Utilities = 'utilities',
+	Insurance = 'insurance',
+	Transportation = 'transportation',
+	Entertainment = 'entertainment',
+	Health = 'health',
+	Debt = 'debt',
+	Misc = 'misc',
+}
+
 export enum Frequencies {
 	Daily = 'daily',
 	Weekly = 'weekly',

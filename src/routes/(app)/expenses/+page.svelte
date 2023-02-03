@@ -4,6 +4,7 @@
 	import type { ICategory, IExpense, IFrequency } from '$lib/types';
 	import { expenses } from '$lib/store';
 	import type { ActionData } from './$types';
+	// import { browser } from '$app/environment';
 
 	export let data: {
 		expenses: IExpense[];
@@ -11,61 +12,17 @@
 		frequencies: IFrequency[];
 	};
 
-	interface DeleteAction {
-		success: boolean;
-		error: string;
-		id: string;
-	}
-
 	export let form: ActionData;
 
-	function removeIndex(i: number): void {
+	function removeExpense(i: number): void {
 		$expenses.splice(i, 1);
-		expenses.set($expenses);
+		$expenses = [...$expenses];
 	}
-	// export let expenses: IExpense[] = [];
-
-	// function addNewExpense(): void {
-	// 	expenses.push({
-	// 		name: undefined,
-	// 		amount: undefined,
-	// 		category: data.categories[0].id,
-	// 		frequency: data.frequencies[0].id,
-	// 		essential: false
-	// 	});
-	// 	expenses = [...expenses];
-	// }
-
-	onMount(() => {
-		expenses.set(data.expenses)
-	});
-
-	// keeps expenses in sync with form
-	afterUpdate(() => {
-		// delete type guard
-		if(form && "id" in form) {
-			for (let i = 0; i < $expenses.length; i++) {
-				if($expenses[i].id === form.id) {
-					$expenses.splice(i, 1);
-					expenses.set($expenses);
-					form.id = undefined;
-					break;
-				}
-			}
-		}
-
-		// add type guard
-		if(form && "expenses" in form) {
-			expenses.set($expenses.concat(form.expenses ?? []));
-			$expenses = [...$expenses]
-			form.expenses = undefined;
-		}
-
-		// update type guard
-	});
 </script>
 
 <h3>Expense Page!</h3>
+
+<!-- browser: {browser} -->
 
 <form
 	method="POST"
@@ -92,7 +49,7 @@
 			<th>Frequency</th>
 			<th>Essential</th>
 		</tr>
-		{#each $expenses as expense, i}
+		{#each data.expenses as expense, i}
 			<tr>
 				<td hidden><input bind:value={expense.id} name="id" type="text" /></td>
 				<td
@@ -135,16 +92,16 @@
 				</td>
 				<td>
 					{#if expense?.id }
-						<button name="delete-id" value={expense?.id} formaction="?/delete">Delete</button>
+						<button id="delete-button" name="delete-id" value={expense?.id} formaction="?/delete">Delete</button>
 					{:else}
-						<button on:click|preventDefault={() => removeIndex(i)}>Remove</button>
+						<button on:click|preventDefault={() => removeExpense(i)}>Remove</button>
 					{/if}
 				</td>
 			</tr>
 		{/each}
-		<button on:click|preventDefault={() => expenses.add()}> Add Expense </button>
 	</table>
-	<button>Save</button>
+	<button formAction="?/add"> Add Expense </button>
+	<button formAction="?/save">Save</button>
 </form>
 
 <form
@@ -152,28 +109,16 @@
 	action="?/uploadCsv"
 	use:enhance={() => {
 		return async ({ result, update }) => {
-			applyAction(result);
+			// applyAction(result);
 			update({ reset: false });
 		};
 	}}
 >
 	<input type="file" id="csv-file" name="csv-file" />
-	<!-- <button>Upload CSV</button> -->
-	<input formAction="?/uploadCsv" type="submit" />
+	<input on:click|preventDefault={() => console.log('test')} formAction="?/uploadCsv" type="submit" />
+	<!-- <button formAction="?/uploadCsv">Submit</button> -->
 </form>
-
-<!-- {form?.success} -->
 
 {#if form?.success}
 	success
 {/if}
-
-<!-- {#if form?.error}
-	{form?.error}
-{/if} -->
-
-<style>
-	.float-right {
-		float: right;
-	}
-</style>
