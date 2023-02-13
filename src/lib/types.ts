@@ -23,13 +23,15 @@ export enum Frequencies {
 }
 
 export interface IExpense {
-	id?: string;
+	id: string;
 	name: string;
 	cost: number;
 	category: string;
 	frequency: string;
 	essential: boolean;
 }
+
+export type Expense = Partial<IExpense>;
 
 export interface ICategory {
 	id: string;

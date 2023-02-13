@@ -1,10 +1,9 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { applyAction, enhance } from '$app/forms';
-	import { afterUpdate, onMount } from 'svelte';
-	import type { ICategory, IExpense, IFrequency } from '$lib/types';
-	import { expenses } from '$lib/store';
+	import type { Expense, ICategory, IExpense, IFrequency } from '$lib/types';
+	import { onMount } from 'svelte';
 	import type { ActionData } from './$types';
-	// import { browser } from '$app/environment';
 
 	export let data: {
 		expenses: IExpense[];
@@ -14,16 +13,45 @@
 
 	export let form: ActionData;
 
+	let expenses: Expense[] = [];
+
+	// initialize expenses with data from the server
+	onMount(() => expenses = data.expenses);
+
+	// if we're not on the browser keep in sync with data from server
+	$: {
+		if (!browser) {
+			expenses = data.expenses;
+		}
+	}
+
+	$: total = expenses.reduce((acc, expense) => {
+		return acc + expense.cost!;
+	}, 0);
+
+	// determine if the form is dirty
+	$: dirty = expenses.some((current, i) => {
+		const original = data.expenses[i];
+		return JSON.stringify(original) !== JSON.stringify(current)
+	});
+
+	function addExpense(): void {
+		expenses = [...expenses, {
+			name: '', 
+			cost: 0, 
+			category: data.categories[0].id, 
+			frequency: data.frequencies[0].id, 
+			essential: false 
+		}];
+	}
+
 	function removeExpense(i: number): void {
-		$expenses.splice(i, 1);
-		$expenses = [...$expenses];
+		expenses = expenses.filter((_, index) => index !== i);
 	}
 </script>
 
 <h3>Expense Page!</h3>
-
-<!-- browser: {browser} -->
-
+dirty: {dirty}
 <form
 	method="POST"
 	action="?/save"
@@ -49,7 +77,7 @@
 			<th>Frequency</th>
 			<th>Essential</th>
 		</tr>
-		{#each data.expenses as expense, i}
+		{#each expenses as expense, i}
 			<tr>
 				<td hidden><input bind:value={expense.id} name="id" type="text" /></td>
 				<td
@@ -91,34 +119,37 @@
 					/>
 				</td>
 				<td>
-					{#if expense?.id }
-						<button id="delete-button" name="delete-id" value={expense?.id} formaction="?/delete">Delete</button>
-					{:else}
-						<button on:click|preventDefault={() => removeExpense(i)}>Remove</button>
-					{/if}
+					<slot />
+					<!-- {#if expense?.id} -->
+						<button
+							on:click|preventDefault={() => removeExpense(i)}
+							id="delete-button"
+							name="delete-id"
+							value={expense?.id}
+							formaction="expenses?/delete">Delete</button
+						>
+						<!-- {:else}
+					<button on:click|preventDefault={() => removeExpense(i)}>Remove</button> -->
+					<!-- {/if} -->
 				</td>
 			</tr>
 		{/each}
 	</table>
-	<button formAction="?/add"> Add Expense </button>
-	<button formAction="?/save">Save</button>
+	<button on:click|preventDefault={addExpense} formAction="?/add"> Add Expense </button>
+	<button on:click|preventDefault={() => console.log('test')} disabled="{!dirty}">Save</button>
 </form>
 
-<form
-	method="POST"
-	action="?/uploadCsv"
-	use:enhance={() => {
-		return async ({ result, update }) => {
-			// applyAction(result);
-			update({ reset: false });
-		};
-	}}
->
-	<input type="file" id="csv-file" name="csv-file" />
-	<input on:click|preventDefault={() => console.log('test')} formAction="?/uploadCsv" type="submit" />
-	<!-- <button formAction="?/uploadCsv">Submit</button> -->
-</form>
+total {total}
+
+<!-- only available w/ csr for now -->
+{#if browser }
+	<form method="POST" action="?/uploadCsv" use:enhance>
+		<input type="file" id="csv-file" name="csv-file" />
+		<button>Upload CSV</button>
+	</form>
+{/if}
+
 
 {#if form?.success}
-	success
+	<p>Success!</p>
 {/if}
